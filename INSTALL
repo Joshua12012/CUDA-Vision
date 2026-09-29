@@ -1,0 +1,113 @@
+================================================================================
+CUDA-Vision: Installation and Environment Setup Guide
+Coursera GPU Specialization Capstone Project
+Author: Joshua Deniese
+================================================================================
+
+This document provides step-by-step instructions for building and running
+the CUDA-Vision project across different operating systems and hardware
+environments (NVIDIA GPUs, CPU-only development workstations, and Coursera Labs).
+
+--------------------------------------------------------------------------------
+1. SYSTEM REQUIREMENTS
+--------------------------------------------------------------------------------
+
+Core Prerequisites:
+  - C++ Compiler: GCC 9+ (supporting C++17) or Clang 10+
+  - Build System: GNU Make (v4.0+) or CMake (v3.18+)
+  - Multithreading: OpenMP library (libomp / libgomp)
+  - Image/Signal I/O: Self-contained header libraries (stb_image, stb_image_write)
+                      included directly in lib/stb/ (NO external OpenCV required).
+
+Optional for GPU Acceleration:
+  - NVIDIA CUDA Toolkit 11.0+ or 12.0+ (nvcc compiler and CUDA runtime)
+  - NVIDIA Driver: 450.xx or newer
+  - CUDA-capable GPU (Compute Capability 5.0+ / Maxwell, Pascal, Volta, Turing, Ampere, Ada, Hopper)
+
+NOTE FOR CPU WORKSTATIONS:
+  If an NVIDIA GPU or the CUDA Toolkit is not installed, the project automatically
+  builds the optimized Heterogeneous CPU engine with OpenMP multi-threading and
+  CUDA grid/block shared-memory emulation. You do NOT need an NVIDIA GPU to build,
+  execute, benchmark, and verify this project!
+
+--------------------------------------------------------------------------------
+2. LINUX INSTALLATION (Ubuntu / Debian)
+--------------------------------------------------------------------------------
+
+Step 1: Install standard C++ build tools and OpenMP
+  sudo apt-get update
+  sudo apt-get install -y build-essential cmake libomp-dev
+
+Step 2 (Optional, for NVIDIA GPU hosts): Install NVIDIA CUDA Toolkit
+  sudo apt-get install -y nvidia-cuda-toolkit
+
+Step 3: Clone the repository and navigate into the project directory
+  git clone <REPOSITORY_URL>
+  cd cuda-adv-lib
+
+Step 4: Build the project
+
+  Option A: Auto-detect (automatically chooses GPU if nvcc exists, else CPU):
+    make all
+
+  Option B: Force CPU build (optimized OpenMP + CUDA tile emulation):
+    make cpu
+
+  Option C: Force GPU build (requires nvcc):
+    make gpu
+
+Step 5: Run the automated execution and verification script:
+    ./run.sh
+
+--------------------------------------------------------------------------------
+3. RUNNING IN COURSERA LABS / GOOGLE COLAB / CLOUD GPU
+--------------------------------------------------------------------------------
+
+In environments with NVIDIA GPUs (such as Coursera GPU Labs or Google Colab):
+  1. Open a terminal session.
+  2. Verify your GPU is visible:
+       nvidia-smi
+       nvcc --version
+  3. Clone and build:
+       git clone <REPOSITORY_URL>
+       cd cuda-adv-lib
+       make gpu
+  4. Run the full pipeline with GPU acceleration:
+       ./bin/cuda_vision --mode gpu --save-all
+  5. Run multi-scale scaling benchmarks:
+       ./bin/cuda_vision --benchmark
+
+--------------------------------------------------------------------------------
+4. LINUX INSTALLATION (Fedora / RHEL / CentOS)
+--------------------------------------------------------------------------------
+
+  sudo dnf groupinstall -y "Development Tools"
+  sudo dnf install -y gcc-c++ make cmake libgomp
+  make all
+
+--------------------------------------------------------------------------------
+5. MACOS INSTALLATION
+--------------------------------------------------------------------------------
+
+  brew install libomp cmake
+  make cpu
+  ./bin/cuda_vision --filter all --save-all
+
+--------------------------------------------------------------------------------
+6. VERIFYING THE BUILD
+--------------------------------------------------------------------------------
+
+Run the built-in self-test and verification target:
+  make test
+
+This executes the pipeline, verifies algorithm equivalence between the OpenMP
+multi-threaded CPU reference and the CUDA shared-memory tiling implementation,
+and confirms that the Peak Signal-to-Noise Ratio (PSNR) reaches 100 dB
+(mathematical equivalence).
+
+To clean compiled binaries:
+  make clean
+
+To package proof of execution artifacts for submission:
+  make package
+================================================================================

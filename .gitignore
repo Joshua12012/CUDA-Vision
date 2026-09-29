@@ -1,0 +1,13 @@
+bin/
+!bin/.gitkeep
+build/
+*.o
+*.obj
+*.exe
+.vscode/
+.idea/
+*.DS_Store
+*.zip
+data/
+artifacts/
+proof_of_execution.tar.gz
